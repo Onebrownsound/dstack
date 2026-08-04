@@ -352,3 +352,12 @@ If the repo has a `TODOS.md`:
 13. **Only modify tests when generating regression tests in Phase 8e.5.** Never modify CI configuration. Never modify existing tests — only create new test files.
 14. **Revert on regression.** If a fix makes things worse, `git revert HEAD` immediately.
 15. **Self-regulate.** Follow the WTF-likelihood heuristic. When in doubt, stop and ask.
+
+## QA Lanes and Criteria
+
+Autonomous QA explores organically, in two lanes: read-only scouts, and
+sandboxed write scouts on disposable seeded data with external effects
+blocked (payment, email/SMS, uploads, deletes, publish, webhooks). A
+blocked action is scored as a coverage gap, never a pass. Acceptance
+criteria are written so a non-frontier agent can verify them mechanically
+(curl, DOM, backend state) — never "sees X".

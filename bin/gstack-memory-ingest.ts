@@ -1255,6 +1255,23 @@ function makePersistentTranscriptDir(): string {
  */
 function isRemoteHttpMcpMode(): boolean {
   const home = process.env.HOME || homedir();
+  // Local patch (2026-07-05): when the gbrain engine is postgres/supabase,
+  // the D11 rationale (protect local PGLite from transcript pollution) does
+  // not apply — a local `gbrain import` writes directly to the remote brain.
+  // Without this, transcripts stage to ~/.gstack/transcripts/run-*/ forever:
+  // the brain-sync allowlist doesn't cover transcripts/** and no admin pull
+  // job exists, so nothing ever indexes them into the brain.
+  try {
+    const gbrainConfigPath = join(home, ".gbrain", "config.json");
+    if (existsSync(gbrainConfigPath)) {
+      const gbrainConfig = JSON.parse(
+        readFileSync(gbrainConfigPath, "utf-8"),
+      ) as { engine?: string };
+      if (gbrainConfig.engine === "postgres") return false;
+    }
+  } catch {
+    // unreadable config → fall through to MCP-registration detection
+  }
   const claudeJsonPath = join(home, ".claude.json");
   if (!existsSync(claudeJsonPath)) return false;
   try {

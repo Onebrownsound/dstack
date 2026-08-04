@@ -339,6 +339,18 @@ user via AskUserQuestion rather than destroying non-WIP commits.
    - Config/route changes can group with the feature they enable
    - If the total diff is small (< 50 lines across < 4 files), a single commit is fine
 
+4. **Extended taxonomy** (beyond feat/fix/refactor/docs/chore):
+   - `tune:` — a threshold or calibration change driven by observed telemetry,
+     with the incident narrative in the body
+   - `harvest:` / `baseline:` — automated cron/sync commits, visually distinct
+     from human-authored work
+   - `[agent]` — provenance tag on the subject when a pipeline authored the commit
+
+5. **Body conventions:** fence the scope ("fixes X only; the rest is triaged
+   into todo.md"), cite the running full-suite test count (not just the delta),
+   and make refactor claims falsifiable ("pure relocation, 8,213 -> 1,093
+   lines, no code changed").
+
 4. **Each commit must be independently valid** — no broken imports, no references to code that doesn't exist yet. Order commits so dependencies come first.
 
 5. Compose each commit message:

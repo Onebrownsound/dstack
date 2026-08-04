@@ -515,8 +515,8 @@ if [ -f "$_GBRAIN_CONFIG" ] && command -v gbrain >/dev/null 2>&1; then
     fi
     if [ -n "$_GBRAIN_PIN_PATH" ]; then
       echo "GBrain configured. Prefer \`gbrain search\`/\`gbrain query\` over Grep for"
-      echo "semantic questions; use \`gbrain code-def\`/\`code-refs\`/\`code-callers\` for"
-      echo "symbol-aware code lookup. See \"## GBrain Search Guidance\" in CLAUDE.md."
+      echo "semantic questions. Installed gbrain 0.18.2 has no code-def/code-refs/"
+      echo "code-callers CLI commands here; use rg/Grep for symbol-aware lookup."
       echo "Run /sync-gbrain to refresh."
     else
       echo "GBrain configured but this worktree isn't pinned yet. Run \`/sync-gbrain --full\`"
@@ -1140,7 +1140,17 @@ matches a past learning, display:
 This makes the compounding visible. The user should see that gstack is getting
 smarter on their codebase over time.
 
+## Brain Context Load
 
+**Skip this entire section if `gbrain` is not on PATH.**
+
+Extract 2-4 keywords from the user's request. Search the brain:
+`gbrain search "<keywords>"`. Read the top 3 results with
+`gbrain get_page "<slug>"`. Use that context to inform your analysis.
+
+If `gbrain search` returns no results or any non-zero exit, proceed
+without brain context. Full search/read protocol + examples:
+see `docs/gbrain-write-surfaces.md` §Context Load.
 
 ## Brain Context (preflight)
 

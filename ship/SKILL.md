@@ -488,8 +488,8 @@ if [ -f "$_GBRAIN_CONFIG" ] && command -v gbrain >/dev/null 2>&1; then
     fi
     if [ -n "$_GBRAIN_PIN_PATH" ]; then
       echo "GBrain configured. Prefer \`gbrain search\`/\`gbrain query\` over Grep for"
-      echo "semantic questions; use \`gbrain code-def\`/\`code-refs\`/\`code-callers\` for"
-      echo "symbol-aware code lookup. See \"## GBrain Search Guidance\" in CLAUDE.md."
+      echo "semantic questions. Installed gbrain 0.18.2 has no code-def/code-refs/"
+      echo "code-callers CLI commands here; use rg/Grep for symbol-aware lookup."
       echo "Run /sync-gbrain to refresh."
     else
       echo "GBrain configured but this worktree isn't pinned yet. Run \`/sync-gbrain --full\`"
@@ -839,7 +839,17 @@ branch name wherever the instructions say "the base branch" or `<default>`.
 
 ---
 
+## Brain Context Load
 
+**Skip this entire section if `gbrain` is not on PATH.**
+
+Extract 2-4 keywords from the user's request. Search the brain:
+`gbrain search "<keywords>"`. Read the top 3 results with
+`gbrain get_page "<slug>"`. Use that context to inform your analysis.
+
+If `gbrain search` returns no results or any non-zero exit, proceed
+without brain context. Full search/read protocol + examples:
+see `docs/gbrain-write-surfaces.md` §Context Load.
 
 # Ship: Fully Automated Ship Workflow
 
@@ -1217,6 +1227,18 @@ user via AskUserQuestion rather than destroying non-WIP commits.
    - Migrations are their own commit (or grouped with the model they support)
    - Config/route changes can group with the feature they enable
    - If the total diff is small (< 50 lines across < 4 files), a single commit is fine
+
+4. **Extended taxonomy** (beyond feat/fix/refactor/docs/chore):
+   - `tune:` — a threshold or calibration change driven by observed telemetry,
+     with the incident narrative in the body
+   - `harvest:` / `baseline:` — automated cron/sync commits, visually distinct
+     from human-authored work
+   - `[agent]` — provenance tag on the subject when a pipeline authored the commit
+
+5. **Body conventions:** fence the scope ("fixes X only; the rest is triaged
+   into todo.md"), cite the running full-suite test count (not just the delta),
+   and make refactor claims falsifiable ("pure relocation, 8,213 -> 1,093
+   lines, no code changed").
 
 4. **Each commit must be independently valid** — no broken imports, no references to code that doesn't exist yet. Order commits so dependencies come first.
 

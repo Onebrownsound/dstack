@@ -485,8 +485,8 @@ if [ -f "$_GBRAIN_CONFIG" ] && command -v gbrain >/dev/null 2>&1; then
     fi
     if [ -n "$_GBRAIN_PIN_PATH" ]; then
       echo "GBrain configured. Prefer \`gbrain search\`/\`gbrain query\` over Grep for"
-      echo "semantic questions; use \`gbrain code-def\`/\`code-refs\`/\`code-callers\` for"
-      echo "symbol-aware code lookup. See \"## GBrain Search Guidance\" in CLAUDE.md."
+      echo "semantic questions. Installed gbrain 0.18.2 has no code-def/code-refs/"
+      echo "code-callers CLI commands here; use rg/Grep for symbol-aware lookup."
       echo "Run /sync-gbrain to refresh."
     else
       echo "GBrain configured but this worktree isn't pinned yet. Run \`/sync-gbrain --full\`"
@@ -1555,8 +1555,8 @@ if [ -f "$_GBRAIN_CONFIG" ] && command -v gbrain >/dev/null 2>&1; then
     fi
     if [ -n "$_GBRAIN_PIN_PATH" ]; then
       echo "GBrain configured. Prefer \`gbrain search\`/\`gbrain query\` over Grep for"
-      echo "semantic questions; use \`gbrain code-def\`/\`code-refs\`/\`code-callers\` for"
-      echo "symbol-aware code lookup. See \"## GBrain Search Guidance\" in CLAUDE.md."
+      echo "semantic questions. Installed gbrain 0.18.2 has no code-def/code-refs/"
+      echo "code-callers CLI commands here; use rg/Grep for symbol-aware lookup."
       echo "Run /sync-gbrain to refresh."
     else
       echo "GBrain configured but this worktree isn't pinned yet. Run \`/sync-gbrain --full\`"
@@ -2193,15 +2193,86 @@ Explain *why* the problem exists before proposing the fix. The implementer needs
 the root cause to validate the solution and avoid introducing the same class of
 bug elsewhere.
 
-### 13. Effort Breakdown
+### 13. Effort Breakdown (no human time)
 
-Per-component, not just a total. "~12h" → "2h schema + 3h service + 4h tests +
-3h frontend." Enables planning and task splitting.
+Never quote effort in hours, days, weeks, sprints, or quarters — software time
+estimates are reliably wrong by factors of ten and anchor decisions to a number
+with no evidentiary basis. Scope per-component in measures that can be checked:
+
+- Token spend range, for AI-driven work ("~50k to draft, ~200k with full review")
+- LOC delta and files touched ("~3 files, ~80 LOC")
+- Number of new tests required
+- Number of distinct new concepts the implementer must learn
+- Complexity tag: trivial / mechanical / requires-judgment / one-way-door
+- Same-shape-as anchor: a prior task this closely resembles
+
+Still per-component, not just a total — that is what enables planning and task
+splitting. Sequence phases by dependency order, never by calendar ("Phase 2
+needs Phase 1's registry", not "Phase 2, week 2"). A real-world wait (soak
+window, backup verification, cooldown) is stated by its purpose, not a duration.
 
 ### 14. Rollback Strategy
 
 For anything touching data, infrastructure, or shared state: how do we undo
 this? Even "revert the PR" is worth stating explicitly.
+
+### 15. Empirical Claims
+
+Any spec whose acceptance rests on a measured comparison (faster, cheaper,
+more accurate) pre-registers the verdict: write the keep/reject rules with
+numeric thresholds across every axis that matters (speed AND correctness AND
+stability), plus interpretation bands for the delta ("within ±0.5: neutral"),
+dated and frozen before data exists. A result that needs a threshold moved
+after the fact is a rejected result. Never silently drop a bad run: document
+exclusion criteria, report raw and filtered numbers side by side, and
+classify failures qualitatively (coherent-but-wrong vs collapse vs crash) —
+averages hide different failure shapes.
+
+### 16. Baseline Reproduction
+
+Before designing a fix or improvement, reproduce the current failure and
+characterize it: where does it fail, how long until an error, how clear is
+the message. That baseline is the "before" picture; the spec is the "after".
+No design work starts without it.
+
+### 17. Premises
+
+State premises as a numbered, falsifiable list, separate from Constraints.
+A premise may be revised mid-review — but only by evidence with a number
+attached, recorded inline ("revised per <source>: <the number that killed it>").
+
+### 18. Multi-Variant Shape Decisions
+
+Non-obvious shape decisions are never single-shot. Generate 3-6 concrete
+competing variants and record a dated approval note naming the winner, the
+rejected variants and why they lost, any explicit carryovers from losers,
+and which aspects are design-locked vs open to implementation judgment.
+
+### 19. Terminal States and Named Retries
+
+Any pipeline with a verdict enumerates ALL terminal states up front,
+including an infra-failure state distinct from product failure and an
+explicit ambiguous state. Infrastructure failure must never be reported as
+a product pass; uncertainty never silently collapses into pass or blind
+retry. Retry policy is small and named: per failure mode, an explicit bound
+and an explicit terminal state on exhaustion. No open-ended resilience.
+
+### 20. Approach Scoring and Proxy Metrics
+
+Score every considered approach on Effort / Risk / Completeness, keep
+rejected options in the doc with a one-line verdict, and include one
+deliberate lateral option. Any proxy or synthetic metric used to justify a
+decision carries a scope-of-validity line: what it licenses and what it
+does not.
+
+### 21. Plan Shape
+
+Name the single blocking dependency in bold in Context, before any
+structure. Mark settled sections "locked with <name>"; keep open risks
+separate. The highest-risk step carries an ordered fallback ladder written
+inline. Every destructive command is paired with a labeled makes-no-changes
+dry run. Keep a known-benign list ("do not chase this") beside the
+footguns. Split verification into automated checks and live human checks.
 
 ---
 
@@ -2250,7 +2321,9 @@ left for the implementer.]
 
 ## Effort Estimate
 
-[Per-component breakdown]
+[Per-component: LOC delta, files touched, tests required, complexity tag
+(trivial / mechanical / requires-judgment / one-way-door), token spend range if
+AI-driven. No hours/days/weeks — the dependency graph carries the sequencing.]
 
 ## Files Reference
 

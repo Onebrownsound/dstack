@@ -769,7 +769,28 @@ staleness detection: if those files are later deleted, the learning can be flagg
 **Only log genuine discoveries.** Don't log obvious things. Don't log things the user
 already knows. A good test: would this insight save time in a future session? If yes, log it.
 
+## Save Results to Brain
 
+**Skip this entire section if `gbrain` is not on PATH.**
+
+After completing this skill, save the output:
+
+```bash
+gbrain put "devex-reviews/<feature-slug>" --content "$(cat <<'EOF'
+---
+title: "Devex Review: <feature name>"
+tags: [devex-review, <feature-slug>]
+---
+<skill output in markdown>
+EOF
+)"
+```
+
+Then extract person/org entities and create stub pages for each one.
+Throttle errors (exit 1 with "throttle"/"rate limit"/"busy") and any
+other non-zero exit are transient — don't retry inline. Full entity-stub
+template, throttle handling, and backlink protocol:
+see `docs/gbrain-write-surfaces.md` §Save Template.
 
 ## Brain Calibration Write-Back (Phase 2 / gated)
 
@@ -865,3 +886,40 @@ Outside voice| Recommended      | Recommended        | Skip
 * After each pass, pause and wait for feedback before moving on.
 * Rate before and after each pass for scannability.
 
+
+## Reporting Findings to the Human
+
+Every finding presented to the user follows this shape, in plain language:
+
+1. **What** is broken or risky — name the thing and what it fails to do.
+2. **Because** — the actual cause, in a sentence a human follows without
+   reading the code.
+3. **This matters because** — the real-world consequence: what the user sees,
+   loses, or risks if it ships this way.
+4. **Fix(es)** — the option(s), with the tradeoff when there is more than one.
+
+File paths, line numbers, and symbol names appear in parentheses where they
+genuinely help locate the issue — never as a substitute for the logical
+what/why/how. A reader should understand the problem and the stakes without
+opening the code.
+
+Do not lead with internal tracker codes (F-3, P0-2, task numbers, commit SHAs).
+A code may appear at most once, in parentheses, after the plain-English point.
+At scale, summarize the shape of the findings, not the ledger.
+
+## Finding Acceptance Bar
+
+A finding is a hypothesis until it survives an attempt to refute it — confirm
+by reproducing (a failing case, a live read-only check, an exact trace), never
+by re-reading the claim. Reviewers agreeing is not proof. Every accepted
+finding states what breaks, the trigger, and what the user loses; no style
+nits, no hypothetical hardening without a concrete failure scenario. Never
+delete a safety gate or step whose purpose is unclear — flag it instead.
+
+## Report Mechanics
+
+Verdict first; evidence after. An anomalies or nothing-found section states
+"none detected" explicitly — silence is not a result. Copyable content
+ships in fenced blocks, never blockquotes. Substantial review output is
+better rendered as an HTML triage page with plain-English explanations
+than a chat wall.

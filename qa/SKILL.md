@@ -492,8 +492,8 @@ if [ -f "$_GBRAIN_CONFIG" ] && command -v gbrain >/dev/null 2>&1; then
     fi
     if [ -n "$_GBRAIN_PIN_PATH" ]; then
       echo "GBrain configured. Prefer \`gbrain search\`/\`gbrain query\` over Grep for"
-      echo "semantic questions; use \`gbrain code-def\`/\`code-refs\`/\`code-callers\` for"
-      echo "symbol-aware code lookup. See \"## GBrain Search Guidance\" in CLAUDE.md."
+      echo "semantic questions. Installed gbrain 0.18.2 has no code-def/code-refs/"
+      echo "code-callers CLI commands here; use rg/Grep for symbol-aware lookup."
       echo "Run /sync-gbrain to refresh."
     else
       echo "GBrain configured but this worktree isn't pinned yet. Run \`/sync-gbrain --full\`"
@@ -843,7 +843,17 @@ branch name wherever the instructions say "the base branch" or `<default>`.
 
 ---
 
+## Brain Context Load
 
+**Skip this entire section if `gbrain` is not on PATH.**
+
+Extract 2-4 keywords from the user's request. Search the brain:
+`gbrain search "<keywords>"`. Read the top 3 results with
+`gbrain get_page "<slug>"`. Use that context to inform your analysis.
+
+If `gbrain search` returns no results or any non-zero exit, proceed
+without brain context. Full search/read protocol + examples:
+see `docs/gbrain-write-surfaces.md` §Context Load.
 
 # /qa: Test → Fix → Verify
 
@@ -1673,7 +1683,14 @@ staleness detection: if those files are later deleted, the learning can be flagg
 **Only log genuine discoveries.** Don't log obvious things. Don't log things the user
 already knows. A good test: would this insight save time in a future session? If yes, log it.
 
+## Save Results to Brain
 
+**Skip this entire section if `gbrain` is not on PATH.**
+
+If the skill output is worth preserving, save it via
+`gbrain put "<slug>" --content "<frontmatter + markdown>"`. Full template
+(heredoc body, frontmatter shape, entity-stub instructions, throttle
+handling): see `docs/gbrain-write-surfaces.md` §Save Template.
 
 ## Additional Rules (qa-specific)
 
@@ -1682,3 +1699,12 @@ already knows. A good test: would this insight save time in a future session? If
 13. **Only modify tests when generating regression tests in Phase 8e.5.** Never modify CI configuration. Never modify existing tests — only create new test files.
 14. **Revert on regression.** If a fix makes things worse, `git revert HEAD` immediately.
 15. **Self-regulate.** Follow the WTF-likelihood heuristic. When in doubt, stop and ask.
+
+## QA Lanes and Criteria
+
+Autonomous QA explores organically, in two lanes: read-only scouts, and
+sandboxed write scouts on disposable seeded data with external effects
+blocked (payment, email/SMS, uploads, deletes, publish, webhooks). A
+blocked action is scored as a coverage gap, never a pass. Acceptance
+criteria are written so a non-frontier agent can verify them mechanically
+(curl, DOM, backend state) — never "sees X".
